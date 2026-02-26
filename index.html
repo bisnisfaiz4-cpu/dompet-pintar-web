@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masuk - Dompet Pintar</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="login-wrapper">
+        <div class="login-promo">
+            <div class="promo-content">
+                <div class="logo">
+                    <i class='bx bxs-wallet-alt'></i> Dompet Pintar
+                </div>
+                <h1>Kelola Keuangan Anda<br><span>dengan Cerdas</span></h1>
+                
+                <ul class="features">
+                    <li><i class='bx bxs-check-circle'></i> Pencatatan Transaksi Mudah</li>
+                    <li><i class='bx bxs-check-circle'></i> Laporan Keuangan Otomatis</li>
+                    <li><i class='bx bxs-check-circle'></i> Aman & Terpercaya</li>
+                </ul>
+            </div>
+            <div class="circle circle-1"></div>
+            <div class="circle circle-2"></div>
+        </div>
+
+        <div class="login-form-container">
+            <div class="form-header">
+                <p>Selamat Datang Kembali 👋</p>
+                <h2>Masuk ke Akun Anda</h2>
+                <p class="subtitle">Kelola keuangan Anda dengan lebih baik</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <div class="input-wrapper">
+                        <i class='bx bx-envelope'></i>
+                        <input type="email" id="email" placeholder="nama@email.com" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="label-row">
+                        <label for="password">Password</label>
+                        <a href="#" class="forgot-pass">Lupa Password?</a>
+                    </div>
+                    <div class="input-wrapper">
+                        <i class='bx bx-lock-alt'></i>
+                        <input type="password" id="password" placeholder="Masukkan password" required>
+                        <i class='bx bx-show toggle-password'></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    <i class='bx bx-wallet'></i> Masuk ke Dashboard
+                </button>
+
+                <div class="divider">
+                    <span>atau masuk dengan</span>
+                </div>
+
+                <div class="sso-buttons">
+                    <button type="button" class="btn-outline"><i class='bx bxl-google'></i> Google</button>
+                    <button type="button" class="btn-outline"><i class='bx bxl-microsoft'></i> Microsoft</button>
+                </div>
+            </form>
+
+            <div class="form-footer">
+                <p>Belum punya akun? <a href="#">Daftar Sekarang</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>

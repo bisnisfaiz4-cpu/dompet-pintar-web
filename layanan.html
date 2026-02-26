@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Layanan Digital - Dompet Pintar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-body">
+
+    <div class="app-container">
+        
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <i class='bx bxs-wallet-alt'></i> Dompet Pintar
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html"><i class='bx bxs-dashboard'></i> Dashboard</a></li>
+                <li><a href="transaksi.html"><i class='bx bx-list-ul'></i> Transaksi</a></li>
+                <li class="active"><a href="layanan.html"><i class='bx bx-grid-alt'></i> Layanan Digital</a></li>
+                <li><a href="freelance-shopee.html"><i class='bx bx-store-alt'></i> Freelance Shopee</a></li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <a href="index.html" class="btn-logout"><i class='bx bx-log-out'></i> Keluar</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            
+            <header class="topbar">
+                <h2>Layanan Digital</h2>
+                <div class="topbar-right">
+                    <div class="profile-menu">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=0D6EFD&color=fff" alt="Profile" class="profile-pic">
+                        <div class="profile-info">
+                            <span class="name">Halo, <strong>Admin!</strong></span>
+                            <span class="role">Administrator <i class='bx bx-chevron-down'></i></span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-content">
+                <div class="section-header" style="margin-bottom: 10px;">
+                    <h3>Rekapitulasi Arus Kas per Produk/Layanan</h3>
+                    <p style="color: var(--text-muted); font-size: 14px;">Pantau performa Pemasukan (Omzet), Pengeluaran (Modal), dan Keuntungan Bersih.</p>
+                </div>
+
+                <div class="layanan-grid" id="layananContainer">
+                    <div style="text-align:center; padding: 40px; width: 100%; grid-column: 1 / -1;">
+                        <i class='bx bx-loader-alt bx-spin' style='font-size: 30px; color: var(--primary-blue);'></i> 
+                        <p style="margin-top: 10px; color: var(--text-muted);">Menghitung performa layanan...</p>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

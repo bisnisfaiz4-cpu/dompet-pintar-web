@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaksi - Dompet Pintar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-body">
+
+    <div class="app-container">
+        
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <i class='bx bxs-wallet-alt'></i> Dompet Pintar
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html"><i class='bx bxs-dashboard'></i> Dashboard</a></li>
+                <li class="active"><a href="transaksi.html"><i class='bx bx-list-ul'></i> Transaksi</a></li>
+                <li><a href="layanan.html"><i class='bx bx-grid-alt'></i> Layanan Digital</a></li>
+                <li><a href="freelance-shopee.html"><i class='bx bx-store-alt'></i> Freelance Shopee</a></li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <a href="index.html" class="btn-logout"><i class='bx bx-log-out'></i> Keluar</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            
+            <header class="topbar">
+                <h2>Transaksi</h2>
+                <div class="topbar-right">
+                    <button class="notif-btn">
+                        <i class='bx bx-bell'></i>
+                        <span class="badge-dot"></span>
+                    </button>
+                    <div class="profile-menu">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=0D6EFD&color=fff" alt="Profile" class="profile-pic">
+                        <div class="profile-info">
+                            <span class="name">Halo, <strong>Admin!</strong></span>
+                            <span class="role">Administrator <i class='bx bx-chevron-down'></i></span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-content">
+                
+                <div class="section-card">
+                    <div class="table-header-flex">
+                        <div class="header-title">
+                            <h3>Semua Transaksi</h3>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-outline-sm" id="btnDownloadCSV" onclick="downloadCSV()">
+                                <i class='bx bx-download'></i> Download Laporan
+                            </button>
+                            <button class="btn-add" id="btnTambahData">
+                                <i class='bx bx-plus'></i> Tambah
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="main-table">
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Kategori</th>
+                                    <th>Keterangan</th>
+                                    <th>Tipe</th>
+                                    <th>Nominal</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="modalTransaksi">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="modalTitle">Tambah Transaksi</h3>
+                <button class="close-btn" id="closeModal"><i class='bx bx-x'></i></button>
+            </div>
+            <form id="formTransaksi" class="modal-form">
+                
+                <div class="input-wrapper">
+                    <i class='bx bx-calendar'></i>
+                    <input type="date" id="tglInput" required>
+                </div>
+
+                <div class="input-wrapper">
+                    <i class='bx bx-category'></i>
+                    <select id="kategoriInput" required>
+                        <option value="" disabled selected>Pilih Produk / Layanan</option>
+                        <option value="Top Up e-Wallet">Top Up e-Wallet</option>
+                        <option value="Top Up Bank">Top Up Bank</option>
+                        <option value="Tarik Tunai">Tarik Tunai</option>
+                        <option value="Pulsa & Kuota">Pulsa & Kuota</option>
+                        <option value="Freelance">Freelance</option>
+                        <option value="Kebutuhan Pribadi">Kebutuhan Pribadi</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                </div>
+
+                <div class="input-wrapper">
+                    <i class='bx bx-transfer-alt'></i>
+                    <select id="tipeInput" required>
+                        <option value="" disabled selected>Pilih Tipe</option>
+                        <option value="Pemasukan">Pemasukan</option>
+                        <option value="Pengeluaran">Pengeluaran</option>
+                    </select>
+                </div>
+
+                <div class="input-wrapper">
+                    <i class='bx bx-note'></i>
+                    <input type="text" id="ketInput" placeholder="Keterangan singkat" required>
+                </div>
+
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                    <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                        <span style="font-weight: 700; color: var(--text-muted); font-size: 18px;">Rp</span>
+                        <input type="text" id="nominalInput" inputmode="numeric" placeholder="0" required style="border: none; outline: none; font-size: 20px; font-weight: 600; color: var(--text-dark); width: 100%; background: transparent;">                    </div>
+                    <button type="button" class="btn-primary btn-simpan" style="width: auto; padding: 10px 25px; border-radius: 20px; margin-top: 0;">Simpan</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
