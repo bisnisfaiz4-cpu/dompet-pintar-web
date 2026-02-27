@@ -11,10 +11,34 @@
         .main-table th, .main-table td { padding: 12px 15px; font-size: 13px; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .form-grid.full { grid-template-columns: 1fr; }
-        
-        /* Gaya khusus untuk area Filter */
         .filter-area { display: flex; gap: 10px; align-items: center; background: #F8FAFC; padding: 5px 10px; border-radius: 10px; border: 1px solid var(--border-color); }
         .filter-area input[type="month"] { border: none; background: transparent; outline: none; font-family: 'Poppins'; font-weight: 500; color: var(--text-dark); cursor: pointer; }
+        
+        .view-section { display: none; opacity: 0; transition: opacity 0.4s ease; }
+        .view-section.active { display: block; opacity: 1; animation: fadeIn 0.4s forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .cell-ceklis { cursor: pointer; text-align: center; font-size: 22px; transition: 0.2s; user-select: none; }
+        .cell-ceklis:hover { background-color: #F3F4F6; transform: scale(1.1); }
+        .btn-switch { background: linear-gradient(135deg, #1E293B, #334155); color: white; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.3s; box-shadow: 0 4px 10px rgba(30, 41, 59, 0.2); }
+        .btn-switch:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(30, 41, 59, 0.3); }
+        .sync-box { background: #F0FDF4; border: 1px dashed #16A34A; padding: 15px; border-radius: 12px; margin-top: 15px; }
+
+        /* =========================================
+           KODE BARU: RESPONSIVE UNTUK HP MOBILE
+           ========================================= */
+        @media (max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; gap: 10px; } /* Jadikan form 1 kolom menyusun ke bawah */
+            .table-header-flex { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .table-header-flex > div { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+            
+            /* Panjangkan tombol agar mudah dipencet jari di HP */
+            .btn-switch, .btn-outline-sm, .btn-add { width: 100%; justify-content: center; padding: 10px; }
+            .filter-area { width: 100%; justify-content: space-between; }
+            
+            /* Rapikan action buttons di mode HP */
+            #viewTransaksi > div:first-child, #viewAkun > div:first-child { flex-direction: column; width: 100%; }
+        }
     </style>
 </head>
 <body class="dashboard-body">
@@ -48,317 +72,359 @@
 
             <div class="dashboard-content">
                 <div class="section-card">
-                    
                     <div class="table-header-flex">
-                        <div class="header-title">
-                            <h3>Data Top Up & Freelance</h3>
-                        </div>
-                        
+                        <div class="header-title"><h3 id="mainTitle">Data Top Up & Freelance</h3></div>
                         <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-                            
+                            <button class="btn-switch" id="btnToggleView" onclick="toggleView()">
+                                <i class='bx bx-grid'></i> <span>Buka Data Akun</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="viewTransaksi" class="view-section active">
+                        <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; justify-content: flex-end;">
                             <div class="filter-area">
                                 <i class='bx bx-filter-alt' style="color: var(--text-muted);"></i>
                                 <input type="month" id="filterBulan" title="Pilih Bulan">
                                 <button class="btn-icon" onclick="resetFilter()" title="Reset Filter" style="padding: 4px; color: #DC3545;"><i class='bx bx-x-circle'></i></button>
                             </div>
-
                             <button class="btn-outline-sm" onclick="downloadCSVFreelance()" style="background: var(--card-bg); color: var(--text-dark); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 10px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 5px;">
                                 <i class='bx bx-download'></i> Laporan
                             </button>
-                            
-                            <button class="btn-add" id="btnTambahFS">
-                                <i class='bx bx-plus'></i> Tambah Data
-                            </button>
+                            <button class="btn-add" id="btnTambahFS"><i class='bx bx-plus'></i> Tambah Data</button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="main-table" id="tableFS">
+                                <thead>
+                                    <tr>
+                                        <th>Tanggal</th><th>Device</th><th>Nomor</th><th>APK</th><th>Via</th><th>Keterangan</th>
+                                        <th style="text-align: right;">H. Normal</th><th style="text-align: right;">Diskon</th>
+                                        <th style="text-align: right;">Cashback</th><th style="text-align: right;">Modal</th>
+                                        <th style="text-align: right; color: #8B5CF6;">TFB</th>
+                                        <th style="text-align: right; color: #0D6EFD;">Laba</th><th style="text-align: center;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody><tr><td colspan="13" style="text-align:center; padding: 20px;"><i class='bx bx-loader-alt bx-spin'></i> Memuat data...</td></tr></tbody>
+                            </table>
                         </div>
                     </div>
 
-                    <div class="table-responsive">
-                        <table class="main-table" id="tableFS">
-                            <thead>
-                                <tr>
-                                    <th>Tanggal</th>
-                                    <th>Device</th>
-                                    <th>Nomor</th>
-                                    <th>APK</th>
-                                    <th>Via</th>
-                                    <th>Keterangan</th>
-                                    <th style="text-align: right;">H. Normal</th>
-                                    <th style="text-align: right;">Diskon</th>
-                                    <th style="text-align: right;">Cashback</th>
-                                    <th style="text-align: right;">Modal</th>
-                                    <th style="text-align: right; color: #0D6EFD;">Laba</th>
-                                    <th style="text-align: center;">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td colspan="12" style="text-align:center; padding: 20px;"><i class='bx bx-loader-alt bx-spin'></i> Memuat data...</td></tr>
-                            </tbody>
-                        </table>
+                    <div id="viewAkun" class="view-section">
+                        <div style="display: flex; gap: 12px; margin-bottom: 20px; justify-content: flex-end;">
+                            <button class="btn-add" id="btnTambahAkun" onclick="bukaModalAkun()" style="background: #10B981; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);">
+                                <i class='bx bx-user-plus'></i> Tambah Akun Manual
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="main-table" id="tableAkun">
+                                <thead id="theadAkun"><tr><th><i class='bx bx-loader-alt bx-spin'></i> Memuat kolom...</th></tr></thead>
+                                <tbody id="tbodyAkun"></tbody>
+                            </table>
+                            <p style="font-size: 12px; color: var(--text-muted); margin-top: 10px;"><i class='bx bx-info-circle'></i> Klik pada kotak untuk menceklis / membatalkan ceklis secara otomatis.</p>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </main>
     </div>
 
     <div class="modal-overlay" id="modalFS">
-        <div class="modal-box" style="max-width: 650px;">
+        <div class="modal-box" style="max-width: 650px; width: 95%;">
             <div class="modal-header">
                 <h3 id="modalTitleFS">Tambah Data Operasional</h3>
-                <button class="close-btn" id="closeModalFS"><i class='bx bx-x'></i></button>
+                <button class="close-btn" onclick="document.getElementById('modalFS').classList.remove('show')"><i class='bx bx-x'></i></button>
             </div>
             <form id="formFS" class="modal-form">
-                
-                <div class="form-grid full">
-                    <div class="input-wrapper"><i class='bx bx-calendar'></i><input type="date" id="fsTanggal" required></div>
-                </div>
-
+                <div class="form-grid full"><div class="input-wrapper"><i class='bx bx-calendar'></i><input type="date" id="fsTanggal" required></div></div>
                 <div class="form-grid">
                     <div class="input-wrapper"><i class='bx bx-devices'></i><input type="text" id="fsDevice" placeholder="Device (Cth: XIAOMI REDMI)" required></div>
                     <div class="input-wrapper"><i class='bx bx-phone'></i><input type="text" id="fsNomor" placeholder="Nomor / ID" required></div>
                 </div>
-
                 <div class="form-grid">
                     <div class="input-wrapper"><i class='bx bxl-android'></i><input type="text" id="fsApk" placeholder="APK (Cth: SHOPEEPAY)" required></div>
                     <div class="input-wrapper"><i class='bx bx-link'></i>
                         <select id="fsVia" required>
                             <option value="" disabled selected>Pilih Jalur (Via)</option>
-                            <option value="APK">APK</option>
-                            <option value="LINK">LINK</option>
-                            <option value="QRIS">QRIS</option>
-                            <option value="LAINNYA">LAINNYA</option>
+                            <option value="APK">APK</option><option value="LINK">LINK</option><option value="QRIS">QRIS</option><option value="LAINNYA">LAINNYA</option>
                         </select>
                     </div>
                 </div>
-
-                <div class="form-grid full">
-                    <div class="input-wrapper"><i class='bx bx-note'></i><input type="text" id="fsKeterangan" placeholder="Keterangan (Cth: KLIK INDOMARET)" required></div>
+                <div class="form-grid full"><div class="input-wrapper"><i class='bx bx-note'></i><input type="text" id="fsKeterangan" placeholder="Keterangan" required></div></div>
+                
+                <div class="sync-box">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <p style="font-size: 13px; color: #15803D; font-weight: 600; margin: 0;"><i class='bx bx-sync'></i> Sinkronisasi Tracking Akun</p>
+                        <label style="display: flex; align-items: center; gap: 5px; font-size: 13px; cursor: pointer; color: #15803D; font-weight: 500;">
+                            <input type="checkbox" id="fsSyncCheck" onchange="toggleSyncMenu()"> Aktifkan
+                        </label>
+                    </div>
+                    <div id="syncMenu" style="display: none; margin-top: 10px;">
+                        <div class="input-wrapper">
+                            <i class='bx bx-check-square'></i>
+                            <select id="fsSyncKolom" style="background: white;">
+                                <option value="" disabled selected>Memuat daftar aplikasi...</option>
+                            </select>
+                        </div>
+                        <p style="font-size: 11px; margin-top: 5px; color: #16A34A;">Akan mencentang ✅ pada matriks jika nomor ini belum dicentang.</p>
+                    </div>
                 </div>
 
                 <hr style="border: 0; border-top: 1px dashed #E2E8F0; margin: 15px 0;">
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px; font-weight: 500;">Rincian Keuangan (Rp)</p>
-
                 <div class="form-grid">
-                    <div class="input-wrapper"><i class='bx bx-money'></i><input type="text" class="uang-input" id="fsHargaNormal" inputmode="numeric" placeholder="Harga Normal"></div>
-                    <div class="input-wrapper"><i class='bx bxs-discount'></i><input type="text" class="uang-input" id="fsDiskon" inputmode="numeric" placeholder="Diskon (Jika Ada)"></div>
+                    <div class="input-wrapper"><i class='bx bx-money'></i><input type="text" class="uang-input" id="fsHargaNormal" placeholder="Harga Normal"></div>
+                    <div class="input-wrapper"><i class='bx bxs-discount'></i><input type="text" class="uang-input" id="fsDiskon" placeholder="Diskon"></div>
                 </div>
-
                 <div class="form-grid">
-                    <div class="input-wrapper"><i class='bx bx-wallet'></i><input type="text" class="uang-input" id="fsCashback" inputmode="numeric" placeholder="Cashback"></div>
-                    <div class="input-wrapper"><i class='bx bx-credit-card'></i><input type="text" class="uang-input" id="fsModal" inputmode="numeric" placeholder="Modal"></div>
+                    <div class="input-wrapper"><i class='bx bx-wallet'></i><input type="text" class="uang-input" id="fsCashback" placeholder="Cashback"></div>
+                    <div class="input-wrapper"><i class='bx bx-credit-card'></i><input type="text" class="uang-input" id="fsModal" placeholder="Modal"></div>
                 </div>
-
+                <div class="form-grid full">
+                    <div class="input-wrapper"><i class='bx bx-transfer'></i><input type="text" class="uang-input" id="fsNominalTfb" placeholder="Nominal TFB (Opsional)"></div>
+                </div>
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
                     <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
-                        <span style="font-weight: 700; color: #0D6EFD; font-size: 14px;">Laba Bersih Rp</span>
-                        <input type="text" class="uang-input" id="fsLaba" inputmode="numeric" placeholder="0" required style="border: none; font-size: 20px; font-weight: 700; color: #0D6EFD; width: 100%; background: transparent;">
+                        <span style="font-weight: 700; color: #0D6EFD; font-size: 14px;">Laba Rp</span>
+                        <input type="text" class="uang-input" id="fsLaba" required style="border: none; font-size: 20px; font-weight: 700; color: #0D6EFD; width: 100%; background: transparent;">
                     </div>
-                    <button type="submit" class="btn-primary" id="btnSimpanFS" style="width: auto; padding: 10px 30px; border-radius: 20px;">Simpan Data</button>
+                    <button type="submit" class="btn-primary" id="btnSimpanFS" style="width: auto; padding: 10px 20px; border-radius: 20px;">Simpan</button>
                 </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalAkun">
+        <div class="modal-box" style="max-width: 400px; width: 95%;">
+            <div class="modal-header">
+                <h3>Tambah Akun / Nomor Baru</h3>
+                <button class="close-btn" onclick="document.getElementById('modalAkun').classList.remove('show')"><i class='bx bx-x'></i></button>
+            </div>
+            <form id="formAkun" class="modal-form">
+                <div class="input-wrapper" style="margin-bottom: 15px;">
+                    <i class='bx bx-calendar'></i>
+                    <input type="text" id="akunBulan" placeholder="Bulan (Cth: NOVEMBER)" required style="text-transform: uppercase;">
+                </div>
+                <div class="input-wrapper">
+                    <i class='bx bx-phone'></i>
+                    <input type="number" id="akunNomor" placeholder="Nomor / ID Akun" required>
+                </div>
+                <button type="submit" class="btn-primary" id="btnSimpanAkun" style="margin-top: 25px; border-radius: 20px;">Tambahkan Akun</button>
             </form>
         </div>
     </div>
 
     <script>
         // ===============================================
-        // MASUKKAN URL GOOGLE APPS SCRIPT-MU DI SINI !!!
+        // MASUKKAN URL GOOGLE APPS SCRIPT-MU DI BAWAH INI
         // ===============================================
         const API_URL = 'https://script.google.com/macros/s/AKfycbzZF4IpaGixmwDwoJj2irti_FZKonwd27WI4BnQvubtVGoM_Qc55spB0KHQas3SjxiAVg/exec'; 
         
-        window.dataFreelance = []; 
-        window.currentEditIdFS = null; // Menyimpan ID saat mode Edit
+        let currentView = 'transaksi'; 
+        function toggleView() {
+            const vTrans = document.getElementById('viewTransaksi'); const vAkun = document.getElementById('viewAkun');
+            const btn = document.getElementById('btnToggleView'); const title = document.getElementById('mainTitle');
+            if (currentView === 'transaksi') {
+                vTrans.classList.remove('active'); setTimeout(() => { vAkun.classList.add('active'); }, 400);
+                btn.innerHTML = "<i class='bx bx-list-ul'></i> <span>Kembali ke Transaksi</span>"; btn.style.background = "linear-gradient(135deg, #0D6EFD, #2563EB)";
+                title.innerText = "Tracking Status Akun"; currentView = 'akun';
+            } else {
+                vAkun.classList.remove('active'); setTimeout(() => { vTrans.classList.add('active'); }, 400);
+                btn.innerHTML = "<i class='bx bx-grid'></i> <span>Buka Data Akun</span>"; btn.style.background = "linear-gradient(135deg, #1E293B, #334155)";
+                title.innerText = "Data Top Up & Freelance"; currentView = 'transaksi';
+            }
+        }
 
+        window.dataFreelance = []; window.currentEditIdFS = null;
+        window.dataAkun = []; window.kolomDinamis = [];
+
+        function formatRibuanUI(angka) { if(!angka) return ""; return angka.toString().replace(/[^0-9]/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
+        function cleanNumber(val) { if(!val) return 0; return parseInt(val.toString().replace(/\./g, '')) || 0; }
         const formatRp = (angka) => new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0 }).format(angka || 0);
-        
-        // Pemisah titik otomatis untuk form
-        function formatRibuanUI(angka) {
-            if(!angka) return "";
-            return angka.toString().replace(/[^0-9]/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        }
+        document.querySelectorAll('.uang-input').forEach(input => { input.addEventListener('input', function(e) { this.value = formatRibuanUI(this.value); }); });
 
-        document.querySelectorAll('.uang-input').forEach(input => {
-            input.addEventListener('input', function(e) { this.value = formatRibuanUI(this.value); });
-        });
-
-        function cleanNumber(val) {
-            if(!val) return 0;
-            return parseInt(val.toString().replace(/\./g, '')) || 0;
-        }
-
-        // AMBIL DATA & RENDER TABEL
         function fetchDataFreelance() {
-            fetch(API_URL + "?sheetName=Freelance_Shopee")
-            .then(res => res.json())
-            .then(result => {
-                if (result.status === 'success') {
-                    window.dataFreelance = result.data.reverse(); // Simpan dan balik urutan
-                    renderTableFS(window.dataFreelance);
-                } else {
-                    document.querySelector('#tableFS tbody').innerHTML = '<tr><td colspan="12" style="text-align:center;">Belum ada data.</td></tr>';
+            fetch(API_URL + "?sheetName=Freelance_Shopee").then(res => res.json()).then(result => {
+                if (result.status === 'success') { window.dataFreelance = result.data.reverse(); renderTableFS(window.dataFreelance); }
+            });
+        }
+
+        function renderTableFS(dataToRender) { 
+            const tbody = document.querySelector('#tableFS tbody'); tbody.innerHTML = '';
+            if(dataToRender.length === 0) { tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;">Tidak ada data.</td></tr>'; return; }
+            dataToRender.forEach(item => {
+                tbody.innerHTML += `<tr>
+                    <td>${item.Tanggal}</td><td>${item.Device}</td><td><strong>${item.Nomor}</strong></td>
+                    <td><span class="status-badge" style="background:#EBF4FF; color:#0A58CA;">${item.APK}</span></td>
+                    <td>${item.Via}</td><td>${item.Keterangan}</td>
+                    <td style="text-align: right;">${formatRp(item['Harga Normal'])}</td><td style="text-align: right; color: #DC3545;">${formatRp(item.Diskon)}</td>
+                    <td style="text-align: right; color: #16A34A;">${formatRp(item.Cashback)}</td><td style="text-align: right;">${formatRp(item.Modal)}</td>
+                    <td style="text-align: right; color: #8B5CF6; font-weight: 500;">${formatRp(item['Nominal TFB'])}</td>
+                    <td style="text-align: right; font-weight: 700; color: #0D6EFD;">${formatRp(item.Laba)}</td>
+                    <td style="text-align: center;"><div style="display:flex; gap:5px; justify-content:center;">
+                        <button class="btn-icon edit" onclick="editDataFS('${item.ID}')"><i class='bx bx-pencil'></i></button>
+                        <button class="btn-icon delete" onclick="hapusDataFS('${item.ID}')"><i class='bx bx-trash'></i></button>
+                    </div></td></tr>`;
+            });
+        }
+
+        document.getElementById('filterBulan').addEventListener('change', function() {
+            const val = this.value; renderTableFS(val ? window.dataFreelance.filter(i => i.Tanggal && i.Tanggal.startsWith(val)) : window.dataFreelance);
+        });
+        window.resetFilter = () => { document.getElementById('filterBulan').value = ''; renderTableFS(window.dataFreelance); }
+
+        function fetchDataAkun() {
+            fetch(API_URL + "?sheetName=Tracking_Akun").then(res => res.json()).then(result => {
+                if (result.status === 'success' && result.data.length > 0) {
+                    window.dataAkun = result.data;
+                    const semuaKolom = Object.keys(result.data[0]);
+                    window.kolomDinamis = semuaKolom.filter(k => k !== 'ID' && k !== 'Bulan' && k !== 'Nomor');
+                    renderTableAkun();
+                    
+                    const syncSelect = document.getElementById('fsSyncKolom');
+                    syncSelect.innerHTML = '<option value="" disabled selected>Pilih Kolom Aplikasi...</option>';
+                    window.kolomDinamis.forEach(kolom => { syncSelect.innerHTML += `<option value="${kolom}">${kolom}</option>`; });
                 }
             });
         }
 
-        function renderTableFS(dataToRender) {
-            const tbody = document.querySelector('#tableFS tbody');
+        function renderTableAkun() {
+            const thead = document.getElementById('theadAkun'); const tbody = document.getElementById('tbodyAkun');
+            let headerHTML = `<tr><th style="min-width: 100px;">Bulan</th><th style="min-width: 150px;">Nomor Akun</th>`;
+            window.kolomDinamis.forEach(kolom => { headerHTML += `<th style="text-align:center; background:#1E293B; color:white; min-width: 90px; border-right: 1px solid #334155;">${kolom}</th>`; });
+            headerHTML += `<th style="text-align:center;">Hapus</th></tr>`; thead.innerHTML = headerHTML;
+
             tbody.innerHTML = '';
-            
-            if(dataToRender.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:20px; color:var(--text-muted);">Tidak ada data pada periode ini.</td></tr>';
-                return;
-            }
-
-            dataToRender.forEach(item => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${item.Tanggal}</td>
-                        <td>${item.Device}</td>
-                        <td><strong>${item.Nomor}</strong></td>
-                        <td><span class="status-badge" style="background:#EBF4FF; color:#0A58CA;">${item.APK}</span></td>
-                        <td>${item.Via}</td>
-                        <td>${item.Keterangan}</td>
-                        <td style="text-align: right;">${formatRp(item['Harga Normal'])}</td>
-                        <td style="text-align: right; color: #DC3545;">${formatRp(item.Diskon)}</td>
-                        <td style="text-align: right; color: #16A34A;">${formatRp(item.Cashback)}</td>
-                        <td style="text-align: right;">${formatRp(item.Modal)}</td>
-                        <td style="text-align: right; font-weight: 700; color: #0D6EFD;">${formatRp(item.Laba)}</td>
-                        <td style="text-align: center;">
-                            <div style="display: flex; gap: 5px; justify-content: center;">
-                                <button class="btn-icon edit" onclick="editDataFS('${item.ID}')" title="Edit"><i class='bx bx-pencil'></i></button>
-                                <button class="btn-icon delete" onclick="hapusDataFS('${item.ID}')" title="Hapus"><i class='bx bx-trash'></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
+            window.dataAkun.forEach(item => {
+                let rowHTML = `<tr><td><strong>${item.Bulan}</strong></td><td style="font-family: monospace; font-size:14px; color:#0A58CA;">${item.Nomor}</td>`;
+                window.kolomDinamis.forEach(kolom => {
+                    const isChecked = item[kolom] === "✅";
+                    const icon = isChecked ? "<i class='bx bxs-check-square' style='color:#10B981;'></i>" : "<i class='bx bx-square' style='color:#CBD5E1;'></i>";
+                    rowHTML += `<td class="cell-ceklis" onclick="toggleCeklis('${item.ID}', '${kolom}')">${icon}</td>`;
+                });
+                rowHTML += `<td style="text-align:center;"><button class="btn-icon delete" onclick="hapusAkun('${item.ID}')"><i class='bx bx-trash'></i></button></td></tr>`;
+                tbody.innerHTML += rowHTML;
             });
         }
 
-        // ===============================================
-        // FITUR BARU 1: FILTER BULAN
-        // ===============================================
-        const filterInput = document.getElementById('filterBulan');
-        filterInput.addEventListener('change', function() {
-            const selectedMonth = this.value; // Formatnya "YYYY-MM", misal: "2026-02"
-            if(!selectedMonth) { renderTableFS(window.dataFreelance); return; }
-
-            const filteredData = window.dataFreelance.filter(item => {
-                // Mengecek apakah string tanggal (YYYY-MM-DD) berawalan YYYY-MM pilihan user
-                return item.Tanggal && item.Tanggal.startsWith(selectedMonth);
-            });
-            renderTableFS(filteredData);
-        });
-
-        window.resetFilter = function() {
-            document.getElementById('filterBulan').value = '';
-            renderTableFS(window.dataFreelance);
+        window.toggleCeklis = function(id, namaKolom) {
+            const item = window.dataAkun.find(x => x.ID === id); if(!item) return;
+            item[namaKolom] = item[namaKolom] === "✅" ? "" : "✅"; renderTableAkun(); 
+            fetch(API_URL, { method: 'POST', body: JSON.stringify({ sheetName: "Tracking_Akun", action: "update", id: id, data: item }) });
         }
 
-        // ===============================================
-        // FITUR BARU 2: EDIT & SIMPAN DATA
-        // ===============================================
-        const modal = document.getElementById('modalFS');
+        window.toggleSyncMenu = function() { document.getElementById('syncMenu').style.display = document.getElementById('fsSyncCheck').checked ? 'block' : 'none'; }
+        
         document.getElementById('btnTambahFS').onclick = () => { 
-            window.currentEditIdFS = null; 
-            document.getElementById('modalTitleFS').innerText = "Tambah Data Operasional";
-            document.getElementById('formFS').reset(); 
-            modal.classList.add('show'); 
+            window.currentEditIdFS = null; document.getElementById('modalTitleFS').innerText = "Tambah Data Operasional";
+            document.getElementById('formFS').reset(); toggleSyncMenu(); document.getElementById('modalFS').classList.add('show'); 
         };
-        document.getElementById('closeModalFS').onclick = () => modal.classList.remove('show');
 
-        // Fungsi Membuka Modal Edit
-        window.editDataFS = function(id) {
-            const item = window.dataFreelance.find(x => x.ID === id);
-            if (!item) return;
-
-            window.currentEditIdFS = id;
-            document.getElementById('modalTitleFS').innerText = "Edit Data Operasional";
-            
-            // Isi semua inputan dengan data lama
-            document.getElementById('fsTanggal').value = item.Tanggal;
-            document.getElementById('fsDevice').value = item.Device;
-            document.getElementById('fsNomor').value = item.Nomor;
-            document.getElementById('fsApk').value = item.APK;
-            document.getElementById('fsVia').value = item.Via;
-            document.getElementById('fsKeterangan').value = item.Keterangan;
-            
-            // Isi form uang dan berikan pemisah titik
-            document.getElementById('fsHargaNormal').value = formatRibuanUI(item['Harga Normal']);
-            document.getElementById('fsDiskon').value = formatRibuanUI(item.Diskon);
-            document.getElementById('fsCashback').value = formatRibuanUI(item.Cashback);
-            document.getElementById('fsModal').value = formatRibuanUI(item.Modal);
-            document.getElementById('fsLaba').value = formatRibuanUI(item.Laba);
-
-            modal.classList.add('show');
+        function getNamaBulan(tanggalString) {
+            const dateObj = new Date(tanggalString);
+            const bulanArr = ['JANUARI','FEBRUARI','MARET','APRIL','MEI','JUNI','JULI','AGUSTUS','SEPTEMBER','OKTOBER','NOVEMBER','DESEMBER'];
+            return bulanArr[dateObj.getMonth()];
         }
 
-        // Simpan Data (Create / Update)
         document.getElementById('formFS').onsubmit = (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btnSimpanFS');
-            btn.innerHTML = "Menyimpan..."; btn.disabled = true;
+            e.preventDefault(); const btn = document.getElementById('btnSimpanFS'); btn.innerHTML = "Memproses..."; btn.disabled = true;
+            
+            const tanggal = document.getElementById('fsTanggal').value;
+            const nomor = document.getElementById('fsNomor').value;
+            const isSync = document.getElementById('fsSyncCheck').checked;
+            const syncKolom = document.getElementById('fsSyncKolom').value;
 
-            const payload = {
-                sheetName: "Freelance_Shopee", 
-                tanggal: document.getElementById('fsTanggal').value,
-                device: document.getElementById('fsDevice').value.toUpperCase(),
-                nomor: document.getElementById('fsNomor').value,
-                apk: document.getElementById('fsApk').value.toUpperCase(),
-                via: document.getElementById('fsVia').value,
-                keterangan: document.getElementById('fsKeterangan').value.toUpperCase(),
-                harga_normal: cleanNumber(document.getElementById('fsHargaNormal').value),
-                diskon: cleanNumber(document.getElementById('fsDiskon').value) || "-",
-                cashback: cleanNumber(document.getElementById('fsCashback').value),
-                modal: cleanNumber(document.getElementById('fsModal').value),
-                laba: cleanNumber(document.getElementById('fsLaba').value)
+            const payload = { sheetName: "Freelance_Shopee", action: window.currentEditIdFS ? "update" : "create",
+                tanggal: tanggal, device: document.getElementById('fsDevice').value.toUpperCase(),
+                nomor: nomor, apk: document.getElementById('fsApk').value.toUpperCase(),
+                via: document.getElementById('fsVia').value, keterangan: document.getElementById('fsKeterangan').value.toUpperCase(),
+                harga_normal: cleanNumber(document.getElementById('fsHargaNormal').value), diskon: cleanNumber(document.getElementById('fsDiskon').value) || "-",
+                cashback: cleanNumber(document.getElementById('fsCashback').value), modal: cleanNumber(document.getElementById('fsModal').value),
+                nominal_tfb: cleanNumber(document.getElementById('fsNominalTfb').value), laba: cleanNumber(document.getElementById('fsLaba').value)
             };
+            if(window.currentEditIdFS) payload.id = window.currentEditIdFS;
 
-            // Jika ada ID yang sedang diedit, tambahkan perintah "update"
-            if(window.currentEditIdFS) {
-                payload.action = "update";
-                payload.id = window.currentEditIdFS;
-            } else {
-                payload.action = "create";
+            fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }).then(r=>r.json()).then(() => {
+                if (isSync && syncKolom && nomor) {
+                    btn.innerHTML = "Menyinkronkan Akun...";
+                    const namaBulan = getNamaBulan(tanggal).toUpperCase();
+                    
+                    // =======================================================
+                    // PERBAIKAN BUG DUPLIKAT: Pastikan string & hapus spasi!
+                    // =======================================================
+                    let akunExisting = window.dataAkun.find(a => 
+                        String(a.Nomor).trim() === String(nomor).trim() && 
+                        String(a.Bulan).toUpperCase() === namaBulan
+                    );
+
+                    let payloadAkun;
+
+                    if (akunExisting) {
+                        // Jika SUDAH ADA, tambahkan centang (Update baris tersebut)
+                        akunExisting[syncKolom] = "✅"; 
+                        payloadAkun = { sheetName: "Tracking_Akun", action: "update", id: akunExisting.ID, data: akunExisting };
+                    } else {
+                        // Jika BELUM ADA, bikin baris baru
+                        let newData = { Bulan: namaBulan, Nomor: String(nomor).trim() }; newData[syncKolom] = "✅";
+                        payloadAkun = { sheetName: "Tracking_Akun", action: "create", data: newData };
+                    }
+                    fetch(API_URL, { method: 'POST', body: JSON.stringify(payloadAkun) }).then(() => selesaiSimpan());
+                } else { selesaiSimpan(); }
+            });
+
+            function selesaiSimpan() {
+                document.getElementById('modalFS').classList.remove('show');
+                fetchDataFreelance(); fetchDataAkun(); 
+                btn.innerHTML = "Simpan"; btn.disabled = false;
             }
-
-            fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(payload)
-            })
-            .then(r => r.json())
-            .then(res => {
-                modal.classList.remove('show');
-                fetchDataFreelance(); // Reload tabel agar data segar
-            })
-            .finally(() => { btn.innerHTML = "Simpan Data"; btn.disabled = false; });
         };
 
-        window.hapusDataFS = function(id) {
-            if(!confirm("Yakin hapus data ini secara permanen?")) return;
-            fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ sheetName: "Freelance_Shopee", action: "delete", id: id })
-            }).then(() => fetchDataFreelance());
+        window.editDataFS = function(id) {
+            const item = window.dataFreelance.find(x => x.ID === id); 
+            if (!item) { alert("Data tidak ditemukan!"); return; }
+
+            window.currentEditIdFS = id; document.getElementById('modalTitleFS').innerText = "Edit Data Operasional";
+            
+            document.getElementById('fsTanggal').value = item['Tanggal'] || '';
+            document.getElementById('fsDevice').value = item['Device'] || '';
+            document.getElementById('fsNomor').value = item['Nomor'] || '';
+            document.getElementById('fsApk').value = item['APK'] || '';
+            document.getElementById('fsVia').value = item['Via'] || '';
+            document.getElementById('fsKeterangan').value = item['Keterangan'] || '';
+            
+            ['Harga Normal','Diskon','Cashback','Modal','Nominal TFB','Laba'].forEach(k => {
+                let inputId = 'fs' + k.replace(' ','').replace('TFB','Tfb');
+                if(document.getElementById(inputId)) document.getElementById(inputId).value = formatRibuanUI(item[k]);
+            });
+            
+            document.getElementById('fsSyncCheck').checked = false; toggleSyncMenu();
+            document.getElementById('modalFS').classList.add('show');
         }
 
-        // DOWNLOAD CSV
+        window.hapusDataFS = (id) => { if(confirm("Hapus transaksi ini?")) fetch(API_URL, { method: 'POST', body: JSON.stringify({ sheetName: "Freelance_Shopee", action: "delete", id: id }) }).then(()=>fetchDataFreelance()); }
+
         window.downloadCSVFreelance = function() {
             if (!window.dataFreelance || window.dataFreelance.length === 0) { alert("Belum ada data!"); return; }
-            let csvContent = "ID,Tanggal,Device,Nomor,APK,Via,Keterangan,Harga Normal,Diskon,Cashback,Modal,Laba\n";
+            let csvContent = "ID,Tanggal,Device,Nomor,APK,Via,Keterangan,Harga Normal,Diskon,Cashback,Modal,Nominal TFB,Laba\n";
             window.dataFreelance.forEach(row => {
                 let ket = `"${(row.Keterangan || "").replace(/"/g, '""')}"`;
-                csvContent += `${row.ID},${row.Tanggal},${row.Device},${row.Nomor},${row.APK},${row.Via},${ket},${row['Harga Normal']},${row.Diskon},${row.Cashback},${row.Modal},${row.Laba}\n`;
+                csvContent += `${row.ID},${row.Tanggal},${row.Device},${row.Nomor},${row.APK},${row.Via},${ket},${row['Harga Normal']},${row.Diskon},${row.Cashback},${row.Modal},${row['Nominal TFB']},${row.Laba}\n`;
             });
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "Laporan_Shopee_Freelance.csv";
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob);
+            link.download = "Laporan_Shopee_Freelance.csv"; document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
 
-        // Jalankan saat halaman dibuka
-        fetchDataFreelance();
+        window.bukaModalAkun = () => { document.getElementById('formAkun').reset(); document.getElementById('modalAkun').classList.add('show'); }
+        document.getElementById('formAkun').onsubmit = (e) => {
+            e.preventDefault(); const btn = document.getElementById('btnSimpanAkun'); btn.innerHTML = "Memproses..."; btn.disabled = true;
+            fetch(API_URL, { method: 'POST', body: JSON.stringify({ sheetName: "Tracking_Akun", action: "create", data: { Bulan: document.getElementById('akunBulan').value.toUpperCase(), Nomor: document.getElementById('akunNomor').value } }) })
+            .then(r => r.json()).then(res => { document.getElementById('modalAkun').classList.remove('show'); fetchDataAkun(); }).finally(() => { btn.innerHTML = "Tambahkan Akun"; btn.disabled = false; });
+        }
+        window.hapusAkun = (id) => { if(confirm("Hapus baris akun ini?")) fetch(API_URL, { method: 'POST', body: JSON.stringify({ sheetName: "Tracking_Akun", action: "delete", id: id }) }).then(()=>fetchDataAkun()); }
+
+        fetchDataFreelance(); fetchDataAkun();
     </script>
 </body>
 </html>
