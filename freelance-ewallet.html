@@ -300,7 +300,7 @@
         window.resetFilter = () => { document.getElementById('filterBulan').value = ''; renderTableFEW(window.dataFEW); }
 
         function fetchDataAkun() {
-            fetch(API_URL + "?sheetName=Tracking_Akun").then(res => res.json()).then(result => {
+            fetch(API_URL + "?sheetName=Tracking_Ewallet").then(res => res.json()).then(result => {
                 if (result.status === 'success' && result.data.length > 0) {
                     window.dataAkun = result.data;
                     const semuaKolom = Object.keys(result.data[0]);
@@ -310,7 +310,13 @@
                     const syncSelect = document.getElementById('fewSyncKolom');
                     syncSelect.innerHTML = '<option value="" disabled selected>Pilih Kolom Aplikasi...</option>';
                     window.kolomDinamis.forEach(kolom => { syncSelect.innerHTML += `<option value="${kolom}">${kolom}</option>`; });
+                } else {
+                    // KODE BARU: Jika Sheet Kosong atau Tidak Ditemukan, matikan loading!
+                    document.getElementById('theadAkun').innerHTML = "<tr><th>Bulan</th><th>Nomor</th><th>Aksi</th></tr>";
+                    document.getElementById('tbodyAkun').innerHTML = "<tr><td colspan='3' style='text-align:center; padding:20px; color:var(--text-muted);'>Belum ada data matriks. Pastikan ada 1 baris data di Excel, atau klik Tambah Akun Manual.</td></tr>";
                 }
+            }).catch(err => {
+                document.getElementById('tbodyAkun').innerHTML = "<tr><td colspan='3' style='text-align:center; color:red;'>Gagal terhubung ke API. Pastikan sudah Deploy Versi Baru!</td></tr>";
             });
         }
 
